@@ -211,8 +211,10 @@ export default function PropertyInvestmentCalculator() {
 
   const weeklyCashFlow = useMemo(() => cashFlow / 52, [cashFlow]);
 
+  // Below market should be negative when purchasePrice is below marketValue.
+  // Example: 9% below market -> -9% (green). 9% above market -> 9% (red).
   const belowMarketPercent = useMemo(
-    () => (n.marketValue > 0 ? ((n.marketValue - n.purchasePrice) / n.marketValue) * 100 : 0),
+    () => (n.marketValue > 0 ? ((n.purchasePrice - n.marketValue) / n.marketValue) * 100 : 0),
     [n.marketValue, n.purchasePrice]
   );
 
@@ -478,14 +480,7 @@ export default function PropertyInvestmentCalculator() {
             />
           </div>
           <div className={cell}>
-            <Row
-              label="Gross Yield"
-              right={
-                <div className={`${valueBoxBase} ${valueColorClass(grossYield)}`}>
-                  {fmtPct(grossYield)}
-                </div>
-              }
-            />
+            <Row label="Gross Yield" right={<div className={valueBoxBase}>{fmtPct(grossYield)}</div>} />
           </div>
 
           {/* Row 2 */}
@@ -500,14 +495,7 @@ export default function PropertyInvestmentCalculator() {
             />
           </div>
           <div className={cell}>
-            <Row
-              label="Net Yield"
-              right={
-                <div className={`${valueBoxBase} ${valueColorClass(netYield)}`}>
-                  {fmtPct(netYield)}
-                </div>
-              }
-            />
+            <Row label="Net Yield" right={<div className={valueBoxBase}>{fmtPct(netYield)}</div>} />
           </div>
 
           {/* Row 3 */}
@@ -518,14 +506,7 @@ export default function PropertyInvestmentCalculator() {
             />
           </div>
           <div className={cell}>
-            <Row
-              label="Annual Rent"
-              right={
-                <div className={`${valueBoxBase} ${valueColorClass(annualRent)}`}>
-                  {fmtCurrency(annualRent)}
-                </div>
-              }
-            />
+            <Row label="Annual Rent" right={<div className={valueBoxBase}>{fmtCurrency(annualRent)}</div>} />
           </div>
 
           {/* Row 4 */}
