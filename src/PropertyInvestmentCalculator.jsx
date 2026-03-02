@@ -130,28 +130,44 @@ export default function PropertyInvestmentCalculator() {
   // Keep UI blank, but treat as 0 internally via toNumberOrZero.
   const [propertyMgmtPercent, setPropertyMgmtPercent] = useState("");
 
-  const n = useMemo(() => ({
-    purchasePrice: toNumberOrZero(purchasePrice),
-    marketValue: toNumberOrZero(marketValue),
-    depositPercent: toNumberOrZero(depositPercent),
-    interestRate: toNumberOrZero(interestRate),
-    rent: toNumberOrZero(rent),
-    vacancyWeeks: toNumberOrZero(vacancyWeeks),
-    rates: toNumberOrZero(rates),
-    insurance: toNumberOrZero(insurance),
-    maintenance: toNumberOrZero(maintenance),
-    bodyCorp: toNumberOrZero(bodyCorp),
-    propertyMgmtPercent: toNumberOrZero(propertyMgmtPercent),
-  }), [
-    purchasePrice, marketValue, depositPercent, interestRate,
-    rent, vacancyWeeks, rates, insurance, maintenance, bodyCorp, propertyMgmtPercent
-  ]);
+  const n = useMemo(
+    () => ({
+      purchasePrice: toNumberOrZero(purchasePrice),
+      marketValue: toNumberOrZero(marketValue),
+      depositPercent: toNumberOrZero(depositPercent),
+      interestRate: toNumberOrZero(interestRate),
+      rent: toNumberOrZero(rent),
+      vacancyWeeks: toNumberOrZero(vacancyWeeks),
+      rates: toNumberOrZero(rates),
+      insurance: toNumberOrZero(insurance),
+      maintenance: toNumberOrZero(maintenance),
+      bodyCorp: toNumberOrZero(bodyCorp),
+      propertyMgmtPercent: toNumberOrZero(propertyMgmtPercent),
+    }),
+    [
+      purchasePrice,
+      marketValue,
+      depositPercent,
+      interestRate,
+      rent,
+      vacancyWeeks,
+      rates,
+      insurance,
+      maintenance,
+      bodyCorp,
+      propertyMgmtPercent,
+    ]
+  );
 
   const annualRent = useMemo(() => {
     const factor =
-      rentPeriod === "weekly" ? 52 :
-      rentPeriod === "fortnightly" ? 26 :
-      rentPeriod === "monthly" ? 12 : 1;
+      rentPeriod === "weekly"
+        ? 52
+        : rentPeriod === "fortnightly"
+        ? 26
+        : rentPeriod === "monthly"
+        ? 12
+        : 1;
     const vacancyFactor = (52 - n.vacancyWeeks) / 52;
     return n.rent * factor * vacancyFactor;
   }, [rentPeriod, n.rent, n.vacancyWeeks]);
@@ -161,10 +177,7 @@ export default function PropertyInvestmentCalculator() {
     [n.purchasePrice, n.depositPercent]
   );
 
-  const equityAtPurchase = useMemo(
-    () => n.marketValue - loanAmount,
-    [n.marketValue, loanAmount]
-  );
+  const equityAtPurchase = useMemo(() => n.marketValue - loanAmount, [n.marketValue, loanAmount]);
 
   const propertyMgmt = useMemo(
     () => (annualRent * n.propertyMgmtPercent) / 100,
@@ -265,7 +278,9 @@ export default function PropertyInvestmentCalculator() {
             PROPERTY WIZARD 🧙‍♂️
           </h1>
           <div className="flex gap-2">
-            <button onClick={handleDownload} className={btn}>Download JPG</button>
+            <button onClick={handleDownload} className={btn}>
+              Download JPG
+            </button>
             <button onClick={() => setTheme(isDark ? "light" : "dark")} className={btn}>
               {isDark ? "Light Mode" : "Dark Mode"}
             </button>
@@ -291,48 +306,151 @@ export default function PropertyInvestmentCalculator() {
           <div className={headerCell}>Purchase Details</div>
 
           <div className={cell}>
-            <Row label="Rates" right={<NumInput value={rates} onChange={(e) => setCaretPreservingFormat(e, setRates)} className={inputClass} />} />
+            <Row
+              label="Rates"
+              right={
+                <NumInput
+                  value={rates}
+                  onChange={(e) => setCaretPreservingFormat(e, setRates)}
+                  className={inputClass}
+                />
+              }
+            />
           </div>
           <div className={cell}>
-            <Row label="Purchase Price" right={<NumInput value={purchasePrice} onChange={(e) => setCaretPreservingFormat(e, setPurchasePrice)} className={inputClass} />} />
-          </div>
-
-          <div className={cell}>
-            <Row label="Insurance" right={<NumInput value={insurance} onChange={(e) => setCaretPreservingFormat(e, setInsurance)} className={inputClass} />} />
-          </div>
-          <div className={cell}>
-            <Row label="Market Value" right={<NumInput value={marketValue} onChange={(e) => setCaretPreservingFormat(e, setMarketValue)} className={inputClass} />} />
-          </div>
-
-          <div className={cell}>
-            <Row label="Maintenance" right={<NumInput value={maintenance} onChange={(e) => setCaretPreservingFormat(e, setMaintenance)} className={inputClass} />} />
-          </div>
-          <div className={cell}>
-            <Row label="Deposit %" right={<NumInput value={depositPercent} onChange={(e) => setCaretPreservingFormat(e, setDepositPercent)} className={inputClass} />} />
-          </div>
-
-          <div className={cell}>
-            <Row label="Body Corporate" right={<NumInput value={bodyCorp} onChange={(e) => setCaretPreservingFormat(e, setBodyCorp)} className={inputClass} />} />
-          </div>
-          <div className={cell}>
-            <Row label="Interest Rate %" right={<NumInput value={interestRate} onChange={(e) => setCaretPreservingFormat(e, setInterestRate)} className={inputClass} />} />
+            <Row
+              label="Purchase Price"
+              right={
+                <NumInput
+                  value={purchasePrice}
+                  onChange={(e) => setCaretPreservingFormat(e, setPurchasePrice)}
+                  className={inputClass}
+                />
+              }
+            />
           </div>
 
           <div className={cell}>
-            <Row label="Property Mgmt %" right={<NumInput value={propertyMgmtPercent} onChange={(e) => setCaretPreservingFormat(e, setPropertyMgmtPercent)} className={inputClass} />} />
+            <Row
+              label="Insurance"
+              right={
+                <NumInput
+                  value={insurance}
+                  onChange={(e) => setCaretPreservingFormat(e, setInsurance)}
+                  className={inputClass}
+                />
+              }
+            />
           </div>
           <div className={cell}>
-            <Row label="Rent" right={<NumInput value={rent} onChange={(e) => setCaretPreservingFormat(e, setRent)} className={inputClass} />} />
+            <Row
+              label="Market Value"
+              right={
+                <NumInput
+                  value={marketValue}
+                  onChange={(e) => setCaretPreservingFormat(e, setMarketValue)}
+                  className={inputClass}
+                />
+              }
+            />
           </div>
 
           <div className={cell}>
-            <Row label="Vacancy (weeks)" right={<NumInput value={vacancyWeeks} onChange={(e) => setCaretPreservingFormat(e, setVacancyWeeks)} className={inputClass} />} />
+            <Row
+              label="Maintenance"
+              right={
+                <NumInput
+                  value={maintenance}
+                  onChange={(e) => setCaretPreservingFormat(e, setMaintenance)}
+                  className={inputClass}
+                />
+              }
+            />
+          </div>
+          <div className={cell}>
+            <Row
+              label="Deposit %"
+              right={
+                <NumInput
+                  value={depositPercent}
+                  onChange={(e) => setCaretPreservingFormat(e, setDepositPercent)}
+                  className={inputClass}
+                />
+              }
+            />
+          </div>
+
+          <div className={cell}>
+            <Row
+              label="Body Corporate"
+              right={
+                <NumInput
+                  value={bodyCorp}
+                  onChange={(e) => setCaretPreservingFormat(e, setBodyCorp)}
+                  className={inputClass}
+                />
+              }
+            />
+          </div>
+          <div className={cell}>
+            <Row
+              label="Interest Rate %"
+              right={
+                <NumInput
+                  value={interestRate}
+                  onChange={(e) => setCaretPreservingFormat(e, setInterestRate)}
+                  className={inputClass}
+                />
+              }
+            />
+          </div>
+
+          <div className={cell}>
+            <Row
+              label="Property Mgmt %"
+              right={
+                <NumInput
+                  value={propertyMgmtPercent}
+                  onChange={(e) => setCaretPreservingFormat(e, setPropertyMgmtPercent)}
+                  className={inputClass}
+                />
+              }
+            />
+          </div>
+          <div className={cell}>
+            <Row
+              label="Rent"
+              right={
+                <NumInput
+                  value={rent}
+                  onChange={(e) => setCaretPreservingFormat(e, setRent)}
+                  className={inputClass}
+                />
+              }
+            />
+          </div>
+
+          <div className={cell}>
+            <Row
+              label="Vacancy (weeks)"
+              right={
+                <NumInput
+                  value={vacancyWeeks}
+                  onChange={(e) => setCaretPreservingFormat(e, setVacancyWeeks)}
+                  className={inputClass}
+                />
+              }
+            />
           </div>
           <div className={cell}>
             <Row
               label="Rent Period"
               right={
-                <select value={rentPeriod} onChange={(e) => setRentPeriod(e.target.value)} className={inputClass}>
+                <select
+                  value={rentPeriod}
+                  onChange={(e) => setRentPeriod(e.target.value)}
+                  className={inputClass}
+                >
                   <option value="weekly">Weekly</option>
                   <option value="fortnightly">Fortnightly</option>
                   <option value="monthly">Monthly</option>
@@ -345,20 +463,28 @@ export default function PropertyInvestmentCalculator() {
           {/* On mobile the grid is 1 column, so show a single Results header.
               On desktop (md+), show two column headings. */}
           <div className={`${headerCell} md:hidden`}>Results</div>
-          <div className={`${headerCell} hidden md:block`}>Capital &amp; Costs</div>
-          <div className={`${headerCell} hidden md:block`}>Income &amp; Returns</div>
+          <div className={`${headerCell} hidden md:block`}>Balance Sheet</div>
+          <div className={`${headerCell} hidden md:block`}>Returns</div>
 
           {/* Row 1 */}
           <div className={cell}>
             <Row
               label="Equity at Purchase"
-              right={<div className={`${valueBoxBase} ${valueColorClass(equityAtPurchase)}`}>{fmtCurrency(equityAtPurchase)}</div>}
+              right={
+                <div className={`${valueBoxBase} ${valueColorClass(equityAtPurchase)}`}>
+                  {fmtCurrency(equityAtPurchase)}
+                </div>
+              }
             />
           </div>
           <div className={cell}>
             <Row
               label="Gross Yield"
-              right={<div className={`${valueBoxBase} ${valueColorClass(grossYield)}`}>{fmtPct(grossYield)}</div>}
+              right={
+                <div className={`${valueBoxBase} ${valueColorClass(grossYield)}`}>
+                  {fmtPct(grossYield)}
+                </div>
+              }
             />
           </div>
 
@@ -366,13 +492,21 @@ export default function PropertyInvestmentCalculator() {
           <div className={cell}>
             <Row
               label="Below Market"
-              right={<div className={`${valueBoxBase} ${valueColorClass(belowMarketPercent)}`}>{fmtPct(belowMarketPercent)}</div>}
+              right={
+                <div className={`${valueBoxBase} ${valueColorClass(belowMarketPercent)}`}>
+                  {fmtPct(belowMarketPercent)}
+                </div>
+              }
             />
           </div>
           <div className={cell}>
             <Row
               label="Net Yield"
-              right={<div className={`${valueBoxBase} ${valueColorClass(netYield)}`}>{fmtPct(netYield)}</div>}
+              right={
+                <div className={`${valueBoxBase} ${valueColorClass(netYield)}`}>
+                  {fmtPct(netYield)}
+                </div>
+              }
             />
           </div>
 
@@ -380,27 +514,32 @@ export default function PropertyInvestmentCalculator() {
           <div className={cell}>
             <Row
               label="Annual Expenses"
-              right={<div className={`${valueBoxBase} ${valueColorClass(annualExpenses)}`}>{fmtCurrency(annualExpenses)}</div>}
+              right={<div className={valueBoxBase}>{fmtCurrency(annualExpenses)}</div>}
             />
           </div>
           <div className={cell}>
             <Row
               label="Annual Rent"
-              right={<div className={`${valueBoxBase} ${valueColorClass(annualRent)}`}>{fmtCurrency(annualRent)}</div>}
+              right={
+                <div className={`${valueBoxBase} ${valueColorClass(annualRent)}`}>
+                  {fmtCurrency(annualRent)}
+                </div>
+              }
             />
           </div>
 
           {/* Row 4 */}
           <div className={cell}>
-            <Row
-              label="Loan Amount"
-              right={<div className={`${valueBoxBase} ${valueColorClass(loanAmount)}`}>{fmtCurrency(loanAmount)}</div>}
-            />
+            <Row label="Loan Amount" right={<div className={valueBoxBase}>{fmtCurrency(loanAmount)}</div>} />
           </div>
           <div className={cell}>
             <Row
               label="Annual Cash Flow"
-              right={<div className={`${valueBoxBase} ${valueColorClass(cashFlow)}`}>{fmtCurrency(cashFlow)}</div>}
+              right={
+                <div className={`${valueBoxBase} ${valueColorClass(cashFlow)}`}>
+                  {fmtCurrency(cashFlow)}
+                </div>
+              }
             />
           </div>
 
@@ -408,7 +547,7 @@ export default function PropertyInvestmentCalculator() {
           <div className={cell}>
             <Row
               label="Annual Debt Service"
-              right={<div className={`${valueBoxBase} ${valueColorClass(annualDebtService)}`}>{fmtCurrency(annualDebtService)}</div>}
+              right={<div className={valueBoxBase}>{fmtCurrency(annualDebtService)}</div>}
             />
           </div>
           <div className={cell}>
@@ -417,10 +556,15 @@ export default function PropertyInvestmentCalculator() {
               right={<div className={weeklyCashFlowBox}>{fmtCurrency(weeklyCashFlow)}</div>}
             />
           </div>
-
         </div>
 
-        <div className={isDark ? "mt-3 text-xs text-[#33ff99]/70 italic tracking-widest" : "mt-3 text-xs text-gray-600 italic tracking-widest"}>
+        <div
+          className={
+            isDark
+              ? "mt-3 text-xs text-[#33ff99]/70 italic tracking-widest"
+              : "mt-3 text-xs text-gray-600 italic tracking-widest"
+          }
+        >
           Property Wizard — Analytical Tools for Investors
         </div>
       </div>
