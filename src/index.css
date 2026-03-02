@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Remove number spinners just in case any inputs end up type=number */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+
+/* Desktop height compression: keep the full calculator visible on shorter laptop screens (e.g., 13") */
+@media (min-width: 768px) and (max-height: 850px) {
+  .pw-shell {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+  .pw-calcbox {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+  .pw-header {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    font-size: 0.9rem !important;
+  }
+  .pw-cell {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    font-size: 0.82rem !important;
+  }
+  .pw-input, .pw-value {
+    padding-top: 0.15rem !important;
+    padding-bottom: 0.15rem !important;
+  }
+}
