@@ -6,7 +6,7 @@ function slugifyFilename(name) {
   if (!trimmed) return "property-wizard";
   return (
     trimmed
-      .replace(/[^A-Za-z0-9\s-]/g, "") // basic ASCII safe
+      .replace(/[^A-Za-z0-9\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
       .slice(0, 80) || "property-wizard"
@@ -30,26 +30,20 @@ function fmtPct(n, decimals = 2) {
 }
 
 function formatNumberInput(value) {
-  // Accept digits, optional leading '-', and a single decimal point. Strip commas/spaces.
   const cleaned = String(value ?? "").replace(/,/g, "").replace(/\s+/g, "");
   if (!cleaned) return "";
 
-  // Keep a leading minus if present (even though most fields are positive; harmless).
   const neg = cleaned.startsWith("-") ? "-" : "";
   const body = cleaned.replace(/[^0-9.]/g, "");
 
-  // Only one decimal point.
   const firstDot = body.indexOf(".");
   const hasDot = firstDot !== -1;
   const intPartRaw = hasDot ? body.slice(0, firstDot) : body;
   const fracPartRaw = hasDot ? body.slice(firstDot + 1) : "";
-
-  // Preserve a trailing dot (e.g. "12.") while typing.
   const endsWithDot = hasDot && body.endsWith(".");
 
-  // Insert commas into the integer part without collapsing leading zeros.
   const intPart = intPartRaw.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  const fracPart = fracPartRaw; // don't format fraction
+  const fracPart = fracPartRaw;
 
   if (hasDot) {
     return neg + intPart + "." + (endsWithDot ? "" : fracPart);
@@ -66,7 +60,6 @@ function setCaretPreservingFormat(e, setter) {
   const formatted = formatNumberInput(el.value);
   setter(formatted);
 
-  // Restore caret after React applies the controlled value.
   requestAnimationFrame(() => {
     try {
       const v = formatted;
@@ -81,12 +74,10 @@ function setCaretPreservingFormat(e, setter) {
       }
       el.setSelectionRange(pos, pos);
     } catch {
-      // ignore
     }
   });
 }
 
-// Defined at module scope so inputs don't remount on every keystroke.
 const Row = ({ label, right }) => (
   <div className="flex items-center justify-between gap-3">
     <span className="min-w-0 flex-1 pr-3">{label}</span>
@@ -111,7 +102,6 @@ export default function PropertyInvestmentCalculator() {
 
   const [propertyName, setPropertyName] = useState("");
 
-  // Editable numeric fields as strings, blank by default.
   const [purchasePrice, setPurchasePrice] = useState("");
   const [marketValue, setMarketValue] = useState("");
   const [depositPercent, setDepositPercent] = useState("");
@@ -125,9 +115,6 @@ export default function PropertyInvestmentCalculator() {
   const [insurance, setInsurance] = useState("");
   const [maintenance, setMaintenance] = useState("");
   const [bodyCorp, setBodyCorp] = useState("");
-
-  // Requested default: 0
-  // Keep UI blank, but treat as 0 internally via toNumberOrZero.
   const [propertyMgmtPercent, setPropertyMgmtPercent] = useState("");
 
   const n = useMemo(
@@ -209,10 +196,22 @@ export default function PropertyInvestmentCalculator() {
     [annualRent, annualExpenses, annualDebtService]
   );
 
-  const weeklyCashFlow = useMemo(() => cashFlow / 52, [cashFlow]);
+  const periodCashFlow = useMemo(() => {
+    if (rentPeriod === "weekly") return cashFlow / 52;
+    if (rentPeriod === "fortnightly") return cashFlow / 26;
+    if (rentPeriod === "monthly") return cashFlow / 12;
+    return cashFlow;
+  }, [cashFlow, rentPeriod]);
 
-  // Below market should be negative when purchasePrice is below marketValue.
-  // Example: 9% below market -> -9% (green). 9% above market -> 9% (red).
+  const periodCashFlowLabel = useMemo(() => {
+    if (rentPeriod === "weekly") return "Weekly Cash Flow";
+    if (rentPeriod === "fortnightly") return "Fortnightly Cash Flow";
+    if (rentPeriod === "monthly") return "Monthly Cash Flow";
+    return "Annual Cash Flow";
+  }, [rentPeriod]);
+
+  const showPeriodCashFlowRow = rentPeriod !== "yearly";
+
   const belowMarketPercent = useMemo(
     () => (n.marketValue > 0 ? ((n.purchasePrice - n.marketValue) / n.marketValue) * 100 : 0),
     [n.marketValue, n.purchasePrice]
@@ -254,7 +253,7 @@ export default function PropertyInvestmentCalculator() {
     return isDark ? "text-red-400" : "text-red-600";
   };
 
-  const weeklyCashFlowBox = valueBoxBase + " " + valueColorClass(weeklyCashFlow);
+  const periodCashFlowBox = valueBoxBase + " " + valueColorClass(periodCashFlow);
 
   const btn = isDark
     ? "px-3 py-1 border border-yellow-400 text-yellow-300 font-mono hover:bg-yellow-400 hover:text-black transition-colors rounded"
@@ -462,13 +461,10 @@ export default function PropertyInvestmentCalculator() {
             />
           </div>
 
-          {/* On mobile the grid is 1 column, so show a single Results header.
-              On desktop (md+), show two column headings. */}
           <div className={`${headerCell} md:hidden`}>Results</div>
           <div className={`${headerCell} hidden md:block`}>Balance Sheet</div>
           <div className={`${headerCell} hidden md:block`}>Returns</div>
 
-          {/* Row 1 */}
           <div className={cell}>
             <Row
               label="Equity at Purchase"
@@ -480,10 +476,12 @@ export default function PropertyInvestmentCalculator() {
             />
           </div>
           <div className={cell}>
-            <Row label="Gross Yield" right={<div className={valueBoxBase}>{fmtPct(grossYield)}</div>} />
+            <Row
+              label="Gross Yield"
+              right={<div className={valueBoxBase}>{fmtPct(grossYield)}</div>}
+            />
           </div>
 
-          {/* Row 2 */}
           <div className={cell}>
             <Row
               label="Below Market"
@@ -495,10 +493,12 @@ export default function PropertyInvestmentCalculator() {
             />
           </div>
           <div className={cell}>
-            <Row label="Net Yield" right={<div className={valueBoxBase}>{fmtPct(netYield)}</div>} />
+            <Row
+              label="Net Yield"
+              right={<div className={valueBoxBase}>{fmtPct(netYield)}</div>}
+            />
           </div>
 
-          {/* Row 3 */}
           <div className={cell}>
             <Row
               label="Annual Expenses"
@@ -506,12 +506,17 @@ export default function PropertyInvestmentCalculator() {
             />
           </div>
           <div className={cell}>
-            <Row label="Annual Rent" right={<div className={valueBoxBase}>{fmtCurrency(annualRent)}</div>} />
+            <Row
+              label="Annual Rent"
+              right={<div className={valueBoxBase}>{fmtCurrency(annualRent)}</div>}
+            />
           </div>
 
-          {/* Row 4 */}
           <div className={cell}>
-            <Row label="Loan Amount" right={<div className={valueBoxBase}>{fmtCurrency(loanAmount)}</div>} />
+            <Row
+              label="Loan Amount"
+              right={<div className={valueBoxBase}>{fmtCurrency(loanAmount)}</div>}
+            />
           </div>
           <div className={cell}>
             <Row
@@ -524,19 +529,20 @@ export default function PropertyInvestmentCalculator() {
             />
           </div>
 
-          {/* Row 5 */}
           <div className={cell}>
             <Row
               label="Annual Debt Service"
               right={<div className={valueBoxBase}>{fmtCurrency(annualDebtService)}</div>}
             />
           </div>
-          <div className={cell}>
-            <Row
-              label="Weekly Cash Flow"
-              right={<div className={weeklyCashFlowBox}>{fmtCurrency(weeklyCashFlow)}</div>}
-            />
-          </div>
+          {showPeriodCashFlowRow && (
+            <div className={cell}>
+              <Row
+                label={periodCashFlowLabel}
+                right={<div className={periodCashFlowBox}>{fmtCurrency(periodCashFlow)}</div>}
+              />
+            </div>
+          )}
         </div>
 
         <div
